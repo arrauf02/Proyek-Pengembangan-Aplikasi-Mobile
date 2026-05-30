@@ -19,6 +19,8 @@ import com.example.bridgebit.data.local.datastore.UserPreferences
 import com.example.bridgebit.presentation.screens.dashboard.DashboardScreen
 import com.example.bridgebit.presentation.screens.detail.TranslationDetailScreen
 import com.example.bridgebit.presentation.screens.workspace.WorkspaceScreen
+import com.example.bridgebit.presentation.screens.vault.VaultScreen
+import com.example.bridgebit.presentation.screens.insights.InsightsScreen
 
 @Composable
 fun AppNavHost(
@@ -59,15 +61,13 @@ fun AppNavHost(
         }
 
         composable<Route.Vault> {
-            Box(modifier = Modifier.fillMaxSize().statusBarsPadding(), contentAlignment = Alignment.Center) {
-                Text("Phrase Vault Screen (Tempat Menyimpan Kosakata Penting)")
-            }
+            VaultScreen(
+                onNavigateToDetail = { id -> navigationActions.navigateToTranslationDetail(id) }
+            )
         }
 
         composable<Route.Insights> {
-            Box(modifier = Modifier.fillMaxSize().statusBarsPadding(), contentAlignment = Alignment.Center) {
-                Text("Learning Insights Screen (Statistik & Grafik Belajar)")
-            }
+            InsightsScreen()
         }
 
         composable<Route.Settings> {

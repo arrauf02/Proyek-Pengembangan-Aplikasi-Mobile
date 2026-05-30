@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.bridgebit.domain.model.Translation
 import com.example.bridgebit.domain.usecase.DeleteTranslationUseCase
 import com.example.bridgebit.domain.usecase.SearchHistoryUseCase
+import com.example.bridgebit.domain.usecase.ToggleVaultStatusUseCase // <-- Import baharu
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -18,14 +19,13 @@ sealed interface DashboardUiState {
 
 class DashboardViewModel(
     private val searchHistoryUseCase: SearchHistoryUseCase,
-    private val deleteTranslationUseCase: DeleteTranslationUseCase
+    private val deleteTranslationUseCase: DeleteTranslationUseCase,
+    private val toggleVaultStatusUseCase: ToggleVaultStatusUseCase // <-- Parameter baharu
 ) : ViewModel() {
 
-    // State untuk Search
     private val _searchQuery = MutableStateFlow("")
     val searchQuery = _searchQuery.asStateFlow()
 
-    // State untuk Filter
     private val _activeFilter = MutableStateFlow("Semua")
     val activeFilter = _activeFilter.asStateFlow()
 
@@ -34,12 +34,11 @@ class DashboardViewModel(
         _searchQuery.flatMapLatest { query -> searchHistoryUseCase(query) },
         _activeFilter
     ) { history, filter ->
-        // Eksekusi filter secara lokal
         val filteredHistory = when (filter) {
             "Vault" -> history.filter { it.isVaulted }
             "Indonesia" -> history.filter { it.sourceLanguage == "Indonesia" || it.targetLanguage == "Indonesia" }
             "Inggris" -> history.filter { it.sourceLanguage == "Inggris" || it.targetLanguage == "Inggris" }
-            else -> history // Jika "Semua"
+            else -> history
         }
 
         if (filteredHistory.isEmpty()) DashboardUiState.Empty
@@ -61,6 +60,13 @@ class DashboardViewModel(
     fun deleteTranslation(id: Long) {
         viewModelScope.launch {
             deleteTranslationUseCase(id)
+        }
+    }
+
+    // <-- FUNGSI BAHARU UNTUK VAULT -->
+    fun toggleVaultStatus(id: Long) {
+        viewModelScope.launch {
+            toggleVaultStatusUseCase(id)
         }
     }
 }

@@ -40,7 +40,6 @@ fun DashboardScreen(
         Column(
             modifier = Modifier.fillMaxSize().padding(paddingValues).padding(horizontal = 16.dp)
         ) {
-            // UI PENCARIAN (Search)
             OutlinedTextField(
                 value = searchQuery,
                 onValueChange = viewModel::onSearchQueryChange,
@@ -58,7 +57,6 @@ fun DashboardScreen(
                 shape = RoundedCornerShape(12.dp)
             )
 
-            // UI FILTER (Chips)
             Row(
                 modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -78,7 +76,6 @@ fun DashboardScreen(
 
             HorizontalDivider(modifier = Modifier.padding(bottom = 8.dp))
 
-            // LIST DENGAN ANIMASI (Extra Features)
             Box(modifier = Modifier.fillMaxSize().weight(1f), contentAlignment = Alignment.Center) {
                 when (state) {
                     is DashboardUiState.Loading -> CircularProgressIndicator()
@@ -92,13 +89,13 @@ fun DashboardScreen(
                             modifier = Modifier.fillMaxSize(),
                             verticalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
-                            items(items = historyList, key = { it.id }) { item -> // Key wajib untuk list animation
+                            items(items = historyList, key = { it.id }) { item ->
                                 TranslationCard(
                                     translation = item,
                                     onClick = { onNavigateToDetail(item.id) },
-                                    onVaultClick = { /* Akan disambung di Backend */ },
+                                    onVaultClick = { viewModel.toggleVaultStatus(item.id) }, // <-- SUDAH DISAMBUNGKAN
                                     onDeleteClick = { viewModel.deleteTranslation(item.id) },
-                                    modifier = Modifier.animateItem() // Built-in list animation dari Compose
+                                    modifier = Modifier.animateItem()
                                 )
                             }
                         }
