@@ -28,10 +28,10 @@ fun WorkspaceScreen(
 
     var expandedSource by remember { mutableStateOf(false) }
     var expandedTarget by remember { mutableStateOf(false) }
-    var expandedCategory by remember { mutableStateOf(false) } // <-- State Kategori
+    var expandedCategory by remember { mutableStateOf(false) }
 
     val availableLanguages = listOf("Indonesia", "Inggris", "Jepang", "Korea", "Arab", "Jerman")
-    val availableCategories = listOf("Umum", "Kuliah", "Bisnis", "Traveling", "Pemrograman", "Percakapan") // <-- List Kategori
+    val availableCategories = listOf("Umum", "Kuliah", "Bisnis", "Traveling", "Pemrograman", "Percakapan")
 
     Scaffold(
         topBar = {
@@ -79,7 +79,7 @@ fun WorkspaceScreen(
                 }
             }
 
-            // <-- DROPDOWN PEMILIHAN KATEGORI BARU -->
+            // Dropdown Kategori
             Box(modifier = Modifier.fillMaxWidth()) {
                 OutlinedButton(
                     onClick = { expandedCategory = true },
@@ -100,11 +100,30 @@ fun WorkspaceScreen(
                 value = viewModel.sourceText.value,
                 onValueChange = {
                     viewModel.sourceText.value = it
-                    viewModel.translatedText.value = if (it.isBlank()) "" else "belum bisa menerjemahkan"
+                    if (it.isBlank()) viewModel.translatedText.value = ""
                 },
                 label = { Text("Ketik teks asli di sini...") },
                 modifier = Modifier.fillMaxWidth().weight(1f)
             )
+
+            // Tombol Terjemahkan
+            Button(
+                onClick = { viewModel.translateText() },
+                enabled = !viewModel.isLoading.value && viewModel.sourceText.value.isNotBlank(),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                if (viewModel.isLoading.value) {
+                    CircularProgressIndicator(modifier = Modifier.size(24.dp), color = MaterialTheme.colorScheme.onPrimary)
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text("AI sedang menerjemahkan...")
+                } else {
+                    Text("Terjemahkan")
+                }
+            }
+
+            if (viewModel.errorMessage.value != null) {
+                Text(text = viewModel.errorMessage.value ?: "", color = MaterialTheme.colorScheme.error)
+            }
 
             // Output Teks Hasil Terjemahan
             Card(modifier = Modifier.fillMaxWidth().weight(1f), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)) {
