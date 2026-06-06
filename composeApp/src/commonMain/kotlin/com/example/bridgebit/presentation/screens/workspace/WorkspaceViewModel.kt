@@ -22,7 +22,7 @@ class WorkspaceViewModel(
     var translatedText = mutableStateOf("")
     var sourceLanguage = mutableStateOf("Indonesia")
     var targetLanguage = mutableStateOf("Inggris")
-    var category = mutableStateOf("Umum")
+    var category = mutableStateOf("") // Dibiarkan kosong di awal
 
     var isLoading = mutableStateOf(false)
     var errorMessage = mutableStateOf<String?>(null)
@@ -49,14 +49,47 @@ class WorkspaceViewModel(
         errorMessage.value = null
 
         viewModelScope.launch {
-            aiRepository.translate(textToTranslate, targetLanguage.value)
+            val prompt = """
+                Terjemahkan teks berikut dari bahasa ${sourceLanguage.value} ke bahasa ${targetLanguage.value}: "$textToTranslate"
+                
+                Tugas keduamu adalah mengklasifikasikan teks tersebut ke dalam TEPAT SATU kategori. 
+                Kamu WAJIB memilih dari daftar kategori berikut (jangan pernah membuat kategori di luar daftar ini):
+                - Teknologi & IT
+                - Akademik & Pendidikan
+                - Keuangan & Kripto
+                - Hiburan & Hobi
+                - Traveling & Transportasi
+                - Bisnis & Profesional
+                - Umum
+                
+                WAJIB balas persis dengan format ini (tanpa awalan/akhiran apapun):
+                T: [Hasil Terjemahan]
+                K: [Nama Kategori dari daftar di atas]
+            """.trimIndent()
+
+            aiRepository.chat(prompt)
                 .onSuccess { result ->
-                    translatedText.value = result
+                    // SAFE PARSING LOGIC
+                    val translated = if (result.contains("T:")) {
+                        result.substringAfter("T:").substringBefore("K:").trim()
+                    } else {
+                        result.trim()
+                    }
+
+                    val detectedCategory = if (result.contains("K:")) {
+                        result.substringAfter("K:").trim()
+                    } else {
+                        ""
+                    }
+
+                    translatedText.value = translated
+                    category.value = if (detectedCategory.isNotBlank()) detectedCategory else "Umum"
                     isLoading.value = false
+
                     saveTranslation {}
                 }
                 .onFailure { error ->
-                    errorMessage.value = error.message
+                    errorMessage.value = "Gagal memanggil AI: ${error.message}"
                     isLoading.value = false
                 }
         }
@@ -70,7 +103,7 @@ class WorkspaceViewModel(
                 translatedText = if (translatedText.value.isBlank()) "Belum ada terjemahan" else translatedText.value,
                 sourceLanguage = sourceLanguage.value,
                 targetLanguage = targetLanguage.value,
-                category = category.value,
+                category = if (category.value.isBlank()) "Umum" else category.value,
                 createdAt = Clock.System.now().toEpochMilliseconds(),
                 updatedAt = Clock.System.now().toEpochMilliseconds()
             )

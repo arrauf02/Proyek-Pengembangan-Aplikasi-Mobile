@@ -55,7 +55,6 @@ fun TranslationCard(
                     overflow = TextOverflow.Ellipsis,
                     modifier = Modifier.weight(1f)
                 )
-
                 Row(horizontalArrangement = Arrangement.spacedBy(Spacing.xs)) {
                     IconButton(
                         onClick = onVaultClick,
@@ -68,7 +67,6 @@ fun TranslationCard(
                             modifier = Modifier.size(18.dp)
                         )
                     }
-
                     IconButton(
                         onClick = onDeleteClick,
                         modifier = Modifier.size(Spacing.xl)
@@ -95,10 +93,30 @@ fun TranslationCard(
             }
 
             Spacer(modifier = Modifier.height(Spacing.md))
-            LanguageBadge(
-                source = translation.sourceLanguage,
-                target = translation.targetLanguage
-            )
+
+            // BARIS BAWAH: Bahasa di kiri, Kategori AI di kanan
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                LanguageBadge(
+                    source = translation.sourceLanguage,
+                    target = translation.targetLanguage
+                )
+
+                Surface(
+                    color = MaterialTheme.colorScheme.secondaryContainer,
+                    shape = RoundedCornerShape(Spacing.xs)
+                ) {
+                    Text(
+                        text = translation.category,
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSecondaryContainer,
+                        modifier = Modifier.padding(horizontal = Spacing.sm, vertical = 2.dp)
+                    )
+                }
+            }
         }
     }
 }
@@ -129,7 +147,6 @@ fun LoadingIndicator(modifier: Modifier = Modifier) {
         modifier = modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
     ) {
-        // Ditambahkan semantics contentDescription untuk kebutuhan Testing
         CircularProgressIndicator(
             color = MaterialTheme.colorScheme.primary,
             modifier = Modifier.semantics { contentDescription = "Loading" }
@@ -152,17 +169,13 @@ fun EmptyState(
         verticalArrangement = Arrangement.Center
     ) {
         icon?.invoke()
-
         Spacer(modifier = Modifier.height(Spacing.md))
-
         Text(
             text = title,
             style = MaterialTheme.typography.titleLarge,
             color = MaterialTheme.colorScheme.onSurface
         )
-
         Spacer(modifier = Modifier.height(Spacing.sm))
-
         Text(
             text = message,
             style = MaterialTheme.typography.bodyMedium,
@@ -189,15 +202,12 @@ fun ErrorState(
             style = MaterialTheme.typography.headlineSmall,
             color = MaterialTheme.colorScheme.error
         )
-
         Spacer(modifier = Modifier.height(Spacing.sm))
-
         Text(
             text = message,
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
-
         if (onRetry != null) {
             Spacer(modifier = Modifier.height(Spacing.md))
             Button(onClick = onRetry) {
