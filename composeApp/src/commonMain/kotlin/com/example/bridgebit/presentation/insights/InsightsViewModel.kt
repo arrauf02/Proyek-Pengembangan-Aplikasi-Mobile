@@ -15,7 +15,9 @@ import kotlinx.coroutines.launch
 
 data class InsightsUiState(
     val totalTranslations: Int = 0,
-    val topicsDistribution: Map<String, Int> = emptyMap()
+    val topicsDistribution: Map<String, Int> = emptyMap(),
+    val topLanguagePair: String = "-",
+    val topCategory: String = "-"
 )
 
 data class QuizQuestion(
@@ -33,13 +35,23 @@ class InsightsViewModel(
     val uiState: StateFlow<InsightsUiState> = getAllHistoryUseCase()
         .map { history ->
             val topics = history.groupBy { it.category }.mapValues { it.value.size }
+
+            // Mencari Kategori Paling Sering Dipakai
+            val topCat = topics.maxByOrNull { it.value }?.key ?: "Belum ada"
+
+            // Mencari Pasangan Bahasa Paling Sering (Contoh: Indonesia -> Inggris)
+            val topLang = history.groupBy { "${it.sourceLanguage} ➔ ${it.targetLanguage}" }
+                .maxByOrNull { it.value.size }?.key ?: "Belum ada"
+
             InsightsUiState(
                 totalTranslations = history.size,
-                topicsDistribution = topics
+                topicsDistribution = topics,
+                topLanguagePair = topLang,
+                topCategory = topCat
             )
         }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), InsightsUiState())
 
-    // STATE KUIS & SKOR
+    // STATE KUIS & SKOR (Tetap sama seperti sebelumnya)
     private val _quizQuestions = MutableStateFlow<List<QuizQuestion>>(emptyList())
     val quizQuestions = _quizQuestions.asStateFlow()
 
@@ -83,52 +95,48 @@ class InsightsViewModel(
                 }
 
                 val numQuestions = _selectedQuestionCount.value
-
-                // EKSTRAKSI KATA
                 val wordPairs = history.flatMap { item ->
                     val words = item.sourceText.split(Regex("\\s+"))
                         .map { it.replace(Regex("[^a-zA-Z]"), "").lowercase() }
                         .filter { it.isNotBlank() }
-
                     words.map { "$it (ke ${item.targetLanguage})" }
                 }.distinct()
 
-                // Validasi jumlah kata (Peringatan tetap berjalan)
                 if (wordPairs.size < numQuestions) {
-                    _quizError.value = "Kosakata di riwayatmu tidak cukup untuk membuat $numQuestions soal (hanya ada ${wordPairs.size} kata unik). Silakan lakukan lebih banyak terjemahan!"
+                    _quizError.value = "Kosakata di riwayatmu tidak cukup untuk membuat $numQuestions soal (hanya ada ${wordPairs.size} kata unik)."
                     _isLoadingQuiz.value = false
                     return@launch
                 }
 
-                // LOGIKA BARU: Kita hanya memberikan tepat 1 kata untuk 1 soal agar AI fokus.
                 val vocabularyList = wordPairs.shuffled().take(numQuestions).joinToString(", ")
 
-                // PROMPT BARU: Instruksi tegas agar AI bebas ngarang jawaban salah (pengecoh)
+                // PROMPT BARU: Format A/B/C/D dengan pemisah mutlak "|||"
                 val prompt = """
-                    Tugasmu adalah membuat TEPAT $numQuestions soal kuis pilihan ganda. 
-                    Materi kuis: Uji arti dari kosakata berikut: $vocabularyList.
+                    Tugasmu membuat TEPAT $numQuestions soal kuis untuk menguji kosakata berikut: $vocabularyList.
                     
-                    ATURAN WAJIB:
-                    1. Kamu harus menghasilkan tepat $numQuestions soal, tidak boleh kurang!
-                    2. Untuk pilihan jawaban yang salah (pengecoh), kamu BEBAS ngarang/membuatnya sendiri dari kata-kata lain yang bersinonim atau mengecoh (tidak harus dari kata di atas).
-                    3. Format output harus persis seperti di bawah ini untuk setiap soal, tanpa tambahan teks pengantar atau penutup apapun:
+                    ATURAN MUTLAK:
+                    1. Jumlah soal WAJIB $numQuestions. Tidak boleh kurang!
+                    2. Kamu WAJIB memisahkan setiap soal dengan teks "|||" (tiga garis lurus).
+                    3. Jangan ada teks pengantar atau penutup. Langsung berikan soalnya.
                     
-                    Q: [Pertanyaan]
-                    O: [Pilihan 1]
-                    O: [Pilihan 2]
-                    O: [Pilihan 3]
-                    O: [Pilihan 4]
-                    A: [Tulis HANYA angka 1, 2, 3, atau 4 untuk jawaban benar]
-                    E: [Penjelasan singkat]
+                    Gunakan format baku ini untuk SETIAP soal:
+                    PERTANYAAN: [Tulis pertanyaan di sini]
+                    A. [Opsi 1]
+                    B. [Opsi 2]
+                    C. [Opsi 3]
+                    D. [Opsi 4]
+                    KUNCI: [Pilih salah satu huruf: A, B, C, atau D]
+                    PENJELASAN: [Tulis penjelasan singkat]
+                    |||
                 """.trimIndent()
 
                 aiRepository.chat(prompt).onSuccess { result ->
                     val questions = parseQuiz(result)
-
                     if (questions.isNotEmpty()) {
-                        _quizQuestions.value = questions
+                        // Pastikan tidak mengambil lebih dari yang diminta
+                        _quizQuestions.value = questions.take(numQuestions)
                     } else {
-                        _quizError.value = "Gagal memproses format. Jawaban Asli AI:\n\n$result"
+                        _quizError.value = "Gagal memproses format AI. AI mengirim:\n\n$result"
                     }
                 }.onFailure {
                     _quizError.value = "Gagal membuat kuis. Pastikan internet aktif."
@@ -141,24 +149,58 @@ class InsightsViewModel(
         }
     }
 
+    // PARSER BARU BERBASIS PEMISAH "|||" (SANGAT TAHAN BANTING)
     private fun parseQuiz(text: String): List<QuizQuestion> {
         val questions = mutableListOf<QuizQuestion>()
-        val blocks = text.split("Q:")
+
+        // 1. Potong blok tepat di teks "|||"
+        val blocks = text.split("|||").map { it.trim() }.filter { it.isNotBlank() }
 
         for (block in blocks) {
-            if (block.isBlank()) continue
-            val cleanBlock = block.replace("*", "")
-            val lines = cleanBlock.lines().map { it.trim() }.filter { it.isNotEmpty() }
+            val lines = block.lines().map { it.trim() }.filter { it.isNotEmpty() }
+            if (lines.isEmpty()) continue
 
-            val q = lines.firstOrNull() ?: continue
-            val ops = lines.filter { it.startsWith("O:") }.map { it.substringAfter("O:").trim() }
-            val aText = lines.find { it.startsWith("A:") }?.substringAfter("A:") ?: "1"
-            val eLine = lines.find { it.startsWith("E:") }?.substringAfter("E:")?.trim() ?: "Jawaban benar."
+            var q = ""
+            val ops = mutableListOf<String>()
+            var ansIndex = 0
+            var expl = "Jawaban benar."
 
-            if (ops.size >= 4) {
-                val rawAnswer = aText.firstOrNull { it.isDigit() }?.digitToIntOrNull() ?: 1
-                val answerIndex = (rawAnswer - 1).coerceIn(0, 3)
-                questions.add(QuizQuestion(q, ops.take(4), answerIndex, eLine))
+            // 2. Ekstrak data baris demi baris dari blok soal tersebut
+            for (line in lines) {
+                val upperLine = line.uppercase()
+
+                if (upperLine.startsWith("PERTANYAAN:")) {
+                    q = line.substringAfter(":").replace("*", "").trim()
+                } else if (upperLine.matches(Regex("^[A-D][\\.\\)]\\s+.*"))) {
+                    // Menangkap format "A. Jawaban" atau "A) Jawaban"
+                    ops.add(line.substring(2).replace("*", "").trim())
+                } else if (upperLine.startsWith("KUNCI:")) {
+                    val key = line.substringAfter(":").replace("*", "").trim().uppercase()
+                    ansIndex = when {
+                        key.contains("A") -> 0
+                        key.contains("B") -> 1
+                        key.contains("C") -> 2
+                        key.contains("D") -> 3
+                        else -> 0
+                    }
+                } else if (upperLine.startsWith("PENJELASAN:")) {
+                    expl = line.substringAfter(":").replace("*", "").trim()
+                }
+            }
+
+            // Fallback (Jaga-jaga jika AI lupa menulis "PERTANYAAN:" tapi langsung menulis soalnya)
+            if (q.isBlank() && lines.isNotEmpty() && !lines.first().uppercase().matches(Regex("^[A-D][\\.\\)]\\s+.*"))) {
+                q = lines.first().replace(Regex("^\\d+\\.\\s*"), "").replace("*", "").trim()
+            }
+
+            // Fallback jika opsi kurang dari 4
+            while (ops.size < 4) {
+                ops.add("Semua jawaban salah")
+            }
+
+            // Jika soal berhasil ditangkap minimal pertanyaannya, masukkan ke dalam kuis
+            if (q.isNotBlank()) {
+                questions.add(QuizQuestion(q, ops.take(4), ansIndex, expl))
             }
         }
         return questions

@@ -63,6 +63,7 @@ kotlin {
             implementation(libs.navigation.compose)
             implementation(libs.coil.compose)
             implementation(libs.coil.network.ktor)
+
         }
 
         commonTest.dependencies {
@@ -85,6 +86,8 @@ kotlin {
             dependencies {
                 implementation(kotlin("test-junit"))
                 implementation("junit:junit:4.13.2")
+                implementation("io.mockk:mockk:1.13.8")
+                implementation("app.cash.turbine:turbine:1.1.0")
             }
         }
 
@@ -155,5 +158,25 @@ tasks.withType<Test> {
     configure<JacocoTaskExtension> {
         isIncludeNoLocationClasses = true
         excludes = listOf("jdk.internal.*")
+    }
+}
+
+kover {
+    reports {
+        filters {
+            excludes {
+                packages(
+                    "com.example.bridgebit.core.*",
+                    "com.example.bridgebit.data.local.*",
+                    "com.example.bridgebit.data.remote.*",
+                    "com.example.bridgebit.data.local.composeApp",
+                    "com.example.bridgebit.data.local.datastore",
+                    "com.example.bridgebit.presentation.components",
+                    "com.example.bridgebit.presentation.navigation",
+                    "com.example.bridgebit.presentation.theme",
+                    "noteai.composeapp.generated.resources"
+                )
+            }
+        }
     }
 }
