@@ -85,7 +85,25 @@ Aplikasi ini mengadopsi **Clean Architecture** yang dipadukan dengan pola **MVVM
 - **Data Layer**: Implementasi Repository yang mengelola sumber data lokal (SQLDelight) dan remote (Ktor untuk Gemini API).
 
 ## Testing & Coverage
-Aplikasi BridgeBit dilengkapi dengan pengujian (*Unit Test* dan *UI Test*) menggunakan JUnit 4, MockK, dan Robolectric. Fokus pengujian dibagi ke dalam 3 *layer* utama:
+Aplikasi BridgeBit dilengkapi dengan pengujian (*Unit Test* dan *UI Test*) menggunakan JUnit 4, MockK, dan Robolectric. 
+
+### Kover Coverage Report
+Berikut adalah status cakupan pengujian (*Test Coverage*) terakhir berdasarkan *Kover Report*:
+
+| Module / Package | Line Coverage |
+| :--- | :---: |
+| **Overall Project (`composeApp`)** | **83.6%** |
+| `presentation.screens.dashboard` | **97.0%** |
+| `presentation.screens.insights` | **76.2%** |
+| `presentation.screens.vault` | **95.3%** |
+| `presentation.screens.workspace` | **97.8%** |
+| `presentation.screens.detail` | **94.9%** |
+
+![Kover Coverage Report](ss_coverage.png)
+
+*(Screenshot Kover HTML Report terbaru dapat dilihat di atas, atau diakses via `build/reports/kover/htmlDebug/index.html` setelah menjalankan task Kover).*
+
+Fokus pengujian dibagi ke dalam 3 *layer* utama:
 
 ### 1. Presentation Layer (UI & ViewModel)
 - **Dashboard (`DashboardScreenTest`, `DashboardViewModelTest`):** Menguji fungsionalitas *Search Bar*, filter multi-kriteria (Vault, Kategori, Bahasa), *empty state*, serta logika *debounce* pada pencarian.
@@ -105,3 +123,5 @@ Aplikasi BridgeBit dilengkapi dengan pengujian (*Unit Test* dan *UI Test*) mengg
    ```bash
    git clone [https://github.com/arrauf02/Proyek-Pengembangan-Aplikasi-Mobile.git](https://github.com/arrauf02/Proyek-Pengembangan-Aplikasi-Mobile.git)
    cd Proyek-Pengembangan-Aplikasi-Mobile
+
+
