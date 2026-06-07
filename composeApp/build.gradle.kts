@@ -176,15 +176,23 @@ kover {
     reports {
         filters {
             excludes {
-                packages(
+                classes(
+                    "com.example.bridgebit.*Activity*",
+                    "com.example.bridgebit.App*",
+                    "com.example.bridgebit.BuildConfig*",
+                    "com.example.bridgebit.Platform*",
+                    "com.example.bridgebit.ComposableSingletons*",
+
+                    // 2. Buang folder konfigurasi dasar
                     "com.example.bridgebit.core.*",
                     "com.example.bridgebit.data.local.*",
-                    "com.example.bridgebit.data.remote.*",
-                    "com.example.bridgebit.data.local.composeApp",
-                    "com.example.bridgebit.data.local.datastore",
-                    "com.example.bridgebit.presentation.components",
+                    "com.example.bridgebit.data.remote.*"
+                )
+
+                // 3. Buang navigasi dan file resource auto-generate
+                packages(
                     "com.example.bridgebit.presentation.navigation",
-                    "com.example.bridgebit.presentation.theme",
+                    "com.example.bridgebit.presentation.theme",// <-- Navigasi resmi diexclude
                     "noteai.composeapp.generated.resources"
                 )
             }
