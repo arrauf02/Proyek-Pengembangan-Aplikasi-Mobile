@@ -11,6 +11,7 @@ BridgeBit adalah aplikasi penerjemah cerdas berbasis AI yang dirancang untuk mem
 
 ## Demo
 Link Demo Sprint 2: [https://youtube.com/shorts/ngfyzMd6CXk?feature=share]
+Video Tes Coverage dan UI Polish Test Sprint 4 PAM: [https://youtu.be/OUmG4H25QWI]
 
 ## Features
 - [ ] **Contextual Translation**: Menerjemahkan teks dengan mempertimbangkan nuansa formal atau santai menggunakan Gemini API.
