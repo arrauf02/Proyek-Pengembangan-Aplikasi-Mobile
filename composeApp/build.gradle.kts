@@ -63,7 +63,6 @@ kotlin {
             implementation(libs.navigation.compose)
             implementation(libs.coil.compose)
             implementation(libs.coil.network.ktor)
-
         }
 
         commonTest.dependencies {
@@ -88,6 +87,10 @@ kotlin {
                 implementation("junit:junit:4.13.2")
                 implementation("io.mockk:mockk:1.13.8")
                 implementation("app.cash.turbine:turbine:1.1.0")
+                // Dependensi UI Testing di Local Unit Test
+                implementation("org.robolectric:robolectric:4.11.1")
+                implementation("androidx.compose.ui:ui-test-junit4:1.6.0")
+                implementation("androidx.compose.ui:ui-test-manifest:1.6.0")
             }
         }
 
@@ -139,6 +142,14 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
+    }
+
+    // WAJIB DITAMBAHKAN UNTUK ROBOLECTRIC
+    testOptions {
+        unitTests {
+            isIncludeAndroidResources = true
+            isReturnDefaultValues = true
+        }
     }
 }
 
