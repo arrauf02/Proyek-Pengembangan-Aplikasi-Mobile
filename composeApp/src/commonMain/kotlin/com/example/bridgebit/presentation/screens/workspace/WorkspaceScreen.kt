@@ -60,9 +60,10 @@ fun WorkspaceScreen(
             // Baris Pemilihan Bahasa
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
                 Box {
+                    val sourceRotation by animateFloatAsState(targetValue = if (expandedSource) 180f else 0f, label = "sourceRot")
                     Row(modifier = Modifier.clickable { expandedSource = true }.padding(8.dp), verticalAlignment = Alignment.CenterVertically) {
                         Text(viewModel.sourceLanguage.value, style = MaterialTheme.typography.bodyLarge)
-                        Icon(Icons.Default.ArrowDropDown, contentDescription = null)
+                        Icon(Icons.Default.ArrowDropDown, contentDescription = null, modifier = Modifier.rotate(sourceRotation))
                     }
                     DropdownMenu(expanded = expandedSource, onDismissRequest = { expandedSource = false }) {
                         availableLanguages.forEach { lang ->
@@ -99,9 +100,10 @@ fun WorkspaceScreen(
                 }
                 
                 Box {
+                    val targetRotation by animateFloatAsState(targetValue = if (expandedTarget) 180f else 0f, label = "targetRot")
                     Row(modifier = Modifier.clickable { expandedTarget = true }.padding(8.dp), verticalAlignment = Alignment.CenterVertically) {
                         Text(viewModel.targetLanguage.value, style = MaterialTheme.typography.bodyLarge)
-                        Icon(Icons.Default.ArrowDropDown, contentDescription = null)
+                        Icon(Icons.Default.ArrowDropDown, contentDescription = null, modifier = Modifier.rotate(targetRotation))
                     }
                     DropdownMenu(expanded = expandedTarget, onDismissRequest = { expandedTarget = false }) {
                         availableLanguages.forEach { lang ->
