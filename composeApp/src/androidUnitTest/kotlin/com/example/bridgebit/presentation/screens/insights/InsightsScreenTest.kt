@@ -3,6 +3,7 @@ package com.example.bridgebit.presentation.screens.insights
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createComposeRule
 import com.example.bridgebit.domain.model.Translation
+import com.example.bridgebit.domain.model.QuizQuestion
 import com.example.bridgebit.domain.repository.AIRepository
 import com.example.bridgebit.domain.usecase.GetAllHistoryUseCase
 import io.mockk.every
@@ -347,35 +348,29 @@ class InsightsScreenTest {
     // ─── Test 27: Quiz Dialog - Menampilkan soal setelah generate sukses ─────
     @Test
     fun insightsScreen_quizDialog_generateSuccess_showsQuestion() {
-        // Mock respon AI yang sesuai format
-        val mockAiResponse = """
-            PERTANYAAN: Apa arti dari Smart Contract?
-            A. Kontrak Pintar
-            B. Kontrak Bodoh
-            C. Kontrak Biasa
-            D. Tidak tahu
-            KUNCI: A
-            PENJELASAN: Smart Contract adalah Kontrak Pintar.
-            |||
-            PERTANYAAN: Apa arti Machine Learning?
-            A. Mesin Jahit
-            B. Pembelajaran Mesin
-            C. Mesin Waktu
-            D. Mesin Ketik
-            KUNCI: B
-            PENJELASAN: Machine Learning adalah Pembelajaran Mesin.
-            |||
-            PERTANYAAN: Apa arti Blockchain?
-            A. Rantai Sepeda
-            B. Rantai Blok
-            C. Rantai Emas
-            D. Rantai Kapal
-            KUNCI: B
-            PENJELASAN: Blockchain adalah Rantai Blok.
-            |||
-        """.trimIndent()
+        // Mock respon AI menggunakan generateQuiz() yang baru
+        val mockQuestions = listOf(
+            QuizQuestion(
+                question = "Apa arti dari Smart Contract?",
+                options = listOf("Kontrak Pintar", "Kontrak Bodoh", "Kontrak Biasa", "Tidak tahu"),
+                correctOptionIndex = 0,
+                explanation = "Smart Contract adalah Kontrak Pintar."
+            ),
+            QuizQuestion(
+                question = "Apa arti Machine Learning?",
+                options = listOf("Mesin Jahit", "Pembelajaran Mesin", "Mesin Waktu", "Mesin Ketik"),
+                correctOptionIndex = 1,
+                explanation = "Machine Learning adalah Pembelajaran Mesin."
+            ),
+            QuizQuestion(
+                question = "Apa arti Blockchain?",
+                options = listOf("Rantai Sepeda", "Rantai Blok", "Rantai Emas", "Rantai Kapal"),
+                correctOptionIndex = 1,
+                explanation = "Blockchain adalah Rantai Blok."
+            )
+        )
 
-        coEvery { aiRepository.chat(any()) } returns Result.success(mockAiResponse)
+        coEvery { aiRepository.generateQuiz(any(), any()) } returns Result.success(mockQuestions)
 
         renderInsightsScreen()
         emitHistory(richHistory)
@@ -396,8 +391,8 @@ class InsightsScreenTest {
 
         // Harus masuk ke Halaman Sedang Kuis, cek apakah judul soal pertama muncul
         composeTestRule.onNodeWithText("Apa arti dari Smart Contract?", useUnmergedTree = true).assertExists()
-        // Cek apakah opsi A muncul
-        composeTestRule.onNodeWithText("A. Kontrak Pintar", useUnmergedTree = true).assertExists()
+        // Cek apakah opsi A muncul (new UI renders option text directly without "A. " prefix)
+        composeTestRule.onNodeWithText("Kontrak Pintar", useUnmergedTree = true).assertExists()
     }
 
 }
