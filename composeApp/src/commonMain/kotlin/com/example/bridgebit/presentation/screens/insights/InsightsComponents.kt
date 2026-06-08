@@ -3,7 +3,9 @@ package com.example.bridgebit.presentation.screens.insights
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.animateIntAsState
 import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
@@ -140,6 +142,12 @@ fun StreakCard(
         colors = listOf(Color(0xFFFF8F00), Color(0xFFE64A19))
     )
 
+    val animatedStreak by animateIntAsState(
+        targetValue = streakCount,
+        animationSpec = tween(durationMillis = 1500, easing = FastOutSlowInEasing),
+        label = "StreakAnimation"
+    )
+
     Card(
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(16.dp),
@@ -167,7 +175,7 @@ fun StreakCard(
                         color = Color.White.copy(alpha = 0.8f)
                     )
                     Text(
-                        text = if (streakCount > 0) "$streakCount Hari Berturut-turut!" else "Mulai Streak Hari Ini!",
+                        text = if (streakCount > 0) "$animatedStreak Hari Berturut-turut!" else "Mulai Streak Hari Ini!",
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold,
                         color = Color.White
@@ -199,6 +207,13 @@ fun WeeklyGoalRing(
         animationSpec = tween(durationMillis = 1500),
         label = "weeklyGoalAnim"
     )
+    
+    val animatedProgressCount by animateIntAsState(
+        targetValue = progress,
+        animationSpec = tween(durationMillis = 1500, easing = FastOutSlowInEasing),
+        label = "weeklyGoalCountAnim"
+    )
+    
     LaunchedEffect(percentage) { animationProgress = percentage }
 
     val primaryColor = MaterialTheme.colorScheme.primary
@@ -248,7 +263,7 @@ fun WeeklyGoalRing(
                 
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Text(
-                        text = "$progress",
+                        text = "$animatedProgressCount",
                         style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.onSurface
