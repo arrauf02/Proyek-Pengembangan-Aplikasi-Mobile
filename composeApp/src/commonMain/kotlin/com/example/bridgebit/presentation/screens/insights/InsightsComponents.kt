@@ -671,6 +671,11 @@ fun QuizProgressHeader(
         targetValue = progress,
         animationSpec = spring(stiffness = 200f)
     )
+    val targetPercentage = if (totalCount > 0) ((currentIndex + 1).toFloat() / totalCount * 100).roundToInt() else 0
+    val animatedPercentage by animateIntAsState(
+        targetValue = targetPercentage,
+        animationSpec = spring(stiffness = 200f)
+    )
 
     Column(modifier = modifier.fillMaxWidth()) {
         Row(
@@ -685,7 +690,7 @@ fun QuizProgressHeader(
                 color = MaterialTheme.colorScheme.primary
             )
             Text(
-                text = "${((currentIndex + 1).toFloat() / totalCount * 100).roundToInt()}%",
+                text = "${animatedPercentage}%",
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
