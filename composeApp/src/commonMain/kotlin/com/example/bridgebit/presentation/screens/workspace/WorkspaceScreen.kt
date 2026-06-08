@@ -1,7 +1,12 @@
 package com.example.bridgebit.presentation.screens.workspace
 
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
@@ -145,14 +150,24 @@ fun WorkspaceScreen(
             Button(
                 onClick = { viewModel.translateText() },
                 enabled = !viewModel.isLoading.value && viewModel.sourceText.value.isNotBlank(),
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth().animateContentSize()
             ) {
-                if (viewModel.isLoading.value) {
-                    CircularProgressIndicator(modifier = Modifier.size(24.dp), color = MaterialTheme.colorScheme.onPrimary)
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text("AI sedang memproses...")
-                } else {
-                    Text("Terjemahkan")
+                AnimatedContent(
+                    targetState = viewModel.isLoading.value,
+                    transitionSpec = {
+                        fadeIn(animationSpec = tween(300)) togetherWith fadeOut(animationSpec = tween(300))
+                    },
+                    label = "TranslateButtonAnimation"
+                ) { isLoading ->
+                    if (isLoading) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            CircularProgressIndicator(modifier = Modifier.size(20.dp), color = MaterialTheme.colorScheme.onPrimary, strokeWidth = 2.dp)
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text("AI sedang memproses...")
+                        }
+                    } else {
+                        Text("Terjemahkan")
+                    }
                 }
             }
 
