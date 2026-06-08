@@ -1,10 +1,12 @@
 package com.example.bridgebit.presentation.screens.detail
 
 import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
+import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
@@ -117,26 +119,36 @@ fun TranslationDetailScreen(
                 }
                 is DetailUiState.Success -> {
                     val translation = (state as DetailUiState.Success).translation
-                    Column(
-                        modifier = Modifier.fillMaxSize().padding(16.dp),
-                        verticalArrangement = Arrangement.spacedBy(16.dp)
+                    var isVisible by remember { mutableStateOf(false) }
+                    LaunchedEffect(Unit) {
+                        isVisible = true
+                    }
+                    
+                    AnimatedVisibility(
+                        visible = isVisible,
+                        enter = fadeIn(tween(400)) + slideInVertically(tween(400)) { it / 4 }
                     ) {
-                        Card(modifier = Modifier.fillMaxWidth()) {
-                            Column(modifier = Modifier.padding(16.dp)) {
-                                Text("Dari: ${translation.sourceLanguage}", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.primary)
-                                Spacer(modifier = Modifier.height(8.dp))
-                                Text(translation.sourceText, style = MaterialTheme.typography.bodyLarge)
-                            }
-                        }
-
-                        Card(
-                            modifier = Modifier.fillMaxWidth(),
-                            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer)
+                        Column(
+                            modifier = Modifier.fillMaxSize().padding(16.dp),
+                            verticalArrangement = Arrangement.spacedBy(16.dp)
                         ) {
-                            Column(modifier = Modifier.padding(16.dp)) {
-                                Text("Ke: ${translation.targetLanguage}", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onPrimaryContainer)
-                                Spacer(modifier = Modifier.height(8.dp))
-                                Text(translation.translatedText, style = MaterialTheme.typography.titleMedium)
+                            Card(modifier = Modifier.fillMaxWidth()) {
+                                Column(modifier = Modifier.padding(16.dp)) {
+                                    Text("Dari: ${translation.sourceLanguage}", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.primary)
+                                    Spacer(modifier = Modifier.height(8.dp))
+                                    Text(translation.sourceText, style = MaterialTheme.typography.bodyLarge)
+                                }
+                            }
+
+                            Card(
+                                modifier = Modifier.fillMaxWidth(),
+                                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer)
+                            ) {
+                                Column(modifier = Modifier.padding(16.dp)) {
+                                    Text("Ke: ${translation.targetLanguage}", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onPrimaryContainer)
+                                    Spacer(modifier = Modifier.height(8.dp))
+                                    Text(translation.translatedText, style = MaterialTheme.typography.titleMedium)
+                                }
                             }
                         }
                     }
