@@ -1076,11 +1076,23 @@ fun QuizResultScreen(
 
         Spacer(modifier = Modifier.height(32.dp))
 
+        val infiniteTransition = rememberInfiniteTransition(label = "retryPulse")
+        val buttonScale by infiniteTransition.animateFloat(
+            initialValue = 1f,
+            targetValue = 1.05f,
+            animationSpec = infiniteRepeatable(
+                animation = tween(1200, easing = FastOutSlowInEasing),
+                repeatMode = RepeatMode.Reverse
+            ),
+            label = "retryPulseAnim"
+        )
+
         Button(
             onClick = onRetry,
             modifier = Modifier
                 .fillMaxWidth()
-                .height(52.dp),
+                .height(52.dp)
+                .scale(buttonScale),
             shape = RoundedCornerShape(14.dp)
         ) {
             Text(
