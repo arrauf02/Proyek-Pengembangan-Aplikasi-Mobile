@@ -73,13 +73,40 @@ fun WorkspaceScreen(
             }
 
             // Input Teks Asal
+            val maxCharCount = 500
             OutlinedTextField(
                 value = viewModel.sourceText.value,
                 onValueChange = {
-                    viewModel.sourceText.value = it
-                    if (it.isBlank()) viewModel.translatedText.value = ""
+                    if (it.length <= maxCharCount) {
+                        viewModel.sourceText.value = it
+                        if (it.isBlank()) viewModel.translatedText.value = ""
+                    }
                 },
                 label = { Text("Ketik teks asli di sini...") },
+                supportingText = {
+                    val count = viewModel.sourceText.value.length
+                    val progress = count / maxCharCount.toFloat()
+                    val color = if (count > 450) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurfaceVariant
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.End,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        CircularProgressIndicator(
+                            progress = { progress },
+                            modifier = Modifier.size(14.dp),
+                            color = color,
+                            strokeWidth = 2.dp,
+                            trackColor = MaterialTheme.colorScheme.surfaceVariant
+                        )
+                        Spacer(modifier = Modifier.width(6.dp))
+                        Text(
+                            text = "$count / $maxCharCount",
+                            color = color,
+                            style = MaterialTheme.typography.bodySmall
+                        )
+                    }
+                },
                 modifier = Modifier.fillMaxWidth().weight(1f)
             )
 
