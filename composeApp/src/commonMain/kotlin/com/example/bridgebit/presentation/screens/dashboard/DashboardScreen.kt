@@ -1,5 +1,10 @@
 package com.example.bridgebit.presentation.screens.dashboard
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandHorizontally
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkHorizontally
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -130,7 +135,11 @@ fun DashboardScreen(
                 }
 
                 // 4. Tombol Reset (Muncul hanya jika ada filter aktif)
-                if (filterState.isVaultOnly || filterState.selectedCategory != null || filterState.selectedLanguage != null) {
+                AnimatedVisibility(
+                    visible = filterState.isVaultOnly || filterState.selectedCategory != null || filterState.selectedLanguage != null,
+                    enter = fadeIn() + expandHorizontally(),
+                    exit = fadeOut() + shrinkHorizontally()
+                ) {
                     TextButton(onClick = { viewModel.resetFilters() }) {
                         Text("Reset")
                     }
