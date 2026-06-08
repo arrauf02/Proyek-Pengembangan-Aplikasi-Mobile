@@ -1,7 +1,7 @@
 package com.example.bridgebit.presentation.screens.dashboard
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.*
 import androidx.compose.animation.expandHorizontally
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -23,6 +23,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.unit.dp
 import com.example.bridgebit.presentation.components.TranslationCard
 import org.koin.compose.viewmodel.koinViewModel
@@ -47,10 +48,24 @@ fun DashboardScreen(
     val availableCategories = listOf("Semua Kategori", "Teknologi & IT", "Akademik & Pendidikan", "Keuangan & Kripto", "Hiburan & Hobi", "Traveling & Transportasi", "Bisnis & Profesional", "Umum")
     val availableLanguages = listOf("Semua Bahasa", "Indonesia", "Inggris", "Jepang", "Korea", "Arab", "Jerman")
 
+    val infiniteTransition = rememberInfiniteTransition(label = "fabPulseTransition")
+    val fabScale by infiniteTransition.animateFloat(
+        initialValue = 1f,
+        targetValue = 1.05f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(1200, easing = FastOutSlowInEasing),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "fabPulse"
+    )
+
     Scaffold(
         topBar = { TopAppBar(title = { Text("BridgeBit History") }) },
         floatingActionButton = {
-            FloatingActionButton(onClick = onNavigateToWorkspace) {
+            FloatingActionButton(
+                onClick = onNavigateToWorkspace,
+                modifier = Modifier.scale(fabScale)
+            ) {
                 Icon(Icons.Default.Add, contentDescription = "Terjemahan Baru")
             }
         }
