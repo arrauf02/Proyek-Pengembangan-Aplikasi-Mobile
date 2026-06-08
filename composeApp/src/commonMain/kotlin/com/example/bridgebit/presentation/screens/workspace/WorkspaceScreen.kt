@@ -122,6 +122,11 @@ fun WorkspaceScreen(
                 supportingText = {
                     val count = viewModel.sourceText.value.length
                     val progress = count / maxCharCount.toFloat()
+                    val animatedProgress by animateFloatAsState(
+                        targetValue = progress,
+                        animationSpec = tween(durationMillis = 300),
+                        label = "charCountProgress"
+                    )
                     val color = if (count > 450) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurfaceVariant
                     Row(
                         modifier = Modifier.fillMaxWidth(),
@@ -129,7 +134,7 @@ fun WorkspaceScreen(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         CircularProgressIndicator(
-                            progress = { progress },
+                            progress = { animatedProgress },
                             modifier = Modifier.size(14.dp),
                             color = color,
                             strokeWidth = 2.dp,
