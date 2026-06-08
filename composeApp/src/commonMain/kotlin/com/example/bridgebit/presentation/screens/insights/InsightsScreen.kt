@@ -122,6 +122,9 @@ fun InsightsScreen(
 
                 ShimmerCard(modifier = Modifier.fillMaxWidth())
 
+                Spacer(modifier = Modifier.height(12.dp))
+                ShimmerCard(modifier = Modifier.fillMaxWidth().height(180.dp))
+
                 Spacer(modifier = Modifier.height(28.dp))
 
                 // ── SECTION 2: TOPIC DISTRIBUTION (SKELETON) ────────────────────
@@ -196,6 +199,14 @@ fun InsightsScreen(
                         }
                     }
                 }
+
+                Spacer(modifier = Modifier.height(12.dp))
+
+                WeeklyGoalRing(
+                    progress = state.weeklyTranslations,
+                    goal = state.weeklyGoal,
+                    modifier = Modifier.fillMaxWidth()
+                )
 
                 Spacer(modifier = Modifier.height(28.dp))
 

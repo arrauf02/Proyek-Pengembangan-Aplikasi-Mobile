@@ -154,7 +154,7 @@ class InsightsScreenTest {
     fun insightsScreen_defaultState_showsZeroTranslations() {
         renderInsightsScreen()
         emitHistory(emptyList())
-        composeTestRule.onNodeWithText("0").assertIsDisplayed()
+        composeTestRule.onAllNodesWithText("0").onFirst().performScrollTo().assertIsDisplayed()
     }
 
     // ─── Test 7: Dengan data, total menampilkan jumlah benar ──────────────────
@@ -162,7 +162,7 @@ class InsightsScreenTest {
     fun insightsScreen_withHistory_showsCorrectTotalTranslations() {
         renderInsightsScreen()
         emitHistory(richHistory)
-        composeTestRule.onNodeWithText("4").assertIsDisplayed()
+        composeTestRule.onAllNodesWithText("4").onFirst().performScrollTo().assertIsDisplayed()
     }
 
     // ─── Test 8: Empty state Distribusi Topik menampilkan pesan ───────────────

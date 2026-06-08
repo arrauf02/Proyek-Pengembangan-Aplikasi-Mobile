@@ -172,6 +172,100 @@ fun StreakCard(
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
+// WEEKLY GOAL RING
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * A circular progress ring for the weekly translation goal.
+ */
+@Composable
+fun WeeklyGoalRing(
+    progress: Int,
+    goal: Int,
+    modifier: Modifier = Modifier
+) {
+    val percentage = if (goal > 0) (progress.toFloat() / goal).coerceIn(0f, 1f) else 0f
+    
+    var animationProgress by remember { mutableFloatStateOf(0f) }
+    val animatedProgress by animateFloatAsState(
+        targetValue = animationProgress,
+        animationSpec = tween(durationMillis = 1500),
+        label = "weeklyGoalAnim"
+    )
+    LaunchedEffect(percentage) { animationProgress = percentage }
+
+    val primaryColor = MaterialTheme.colorScheme.primary
+    val trackColor = MaterialTheme.colorScheme.surfaceVariant
+
+    Card(
+        modifier = modifier,
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp).fillMaxWidth(),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                text = "Target Minggu Ini",
+                style = MaterialTheme.typography.labelMedium,
+                fontWeight = FontWeight.SemiBold,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+            
+            Box(
+                modifier = Modifier.size(100.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Canvas(modifier = Modifier.matchParentSize()) {
+                    drawArc(
+                        color = trackColor,
+                        startAngle = -90f,
+                        sweepAngle = 360f,
+                        useCenter = false,
+                        style = Stroke(width = 12.dp.toPx(), cap = StrokeCap.Round)
+                    )
+                    
+                    if (animatedProgress > 0f) {
+                        drawArc(
+                            color = primaryColor,
+                            startAngle = -90f,
+                            sweepAngle = animatedProgress * 360f,
+                            useCenter = false,
+                            style = Stroke(width = 12.dp.toPx(), cap = StrokeCap.Round)
+                        )
+                    }
+                }
+                
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text(
+                        text = "$progress",
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                    Text(
+                        text = "/ $goal",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            }
+            
+            Spacer(modifier = Modifier.height(12.dp))
+            val remaining = (goal - progress).coerceAtLeast(0)
+            Text(
+                text = if (remaining > 0) "$remaining lagi menuju target!" else "Target tercapai! 🎉",
+                style = MaterialTheme.typography.labelSmall,
+                color = if (remaining > 0) MaterialTheme.colorScheme.onSurfaceVariant else Color(0xFF43A047)
+            )
+        }
+    }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 // VOCABULARY BAR CHART
 // ─────────────────────────────────────────────────────────────────────────────
 

@@ -30,6 +30,8 @@ data class InsightsUiState(
     val isLoading: Boolean = true,
     val totalTranslations: Int = 0,
     val currentStreak: Int = 0,
+    val weeklyTranslations: Int = 0,
+    val weeklyGoal: Int = 20,
     val topicsDistribution: Map<String, Int> = emptyMap(),
     val topLanguagePair: String = "-",
     val topCategory: String = "-",
@@ -61,6 +63,7 @@ class InsightsViewModel(
                 dailyMap[dayName] = (dailyMap[dayName] ?: 0) + 1
             }
             val dailyStats = dayNames.map { it to (dailyMap[it] ?: 0) }
+            val weeklySum = dailyStats.sumOf { it.second }
 
             // Streak calculation
             val currentEpochDay = Clock.System.now().toEpochMilliseconds() / 86_400_000L
@@ -85,6 +88,7 @@ class InsightsViewModel(
                 isLoading = false,
                 totalTranslations = history.size,
                 currentStreak = streak,
+                weeklyTranslations = weeklySum,
                 topicsDistribution = topics,
                 topLanguagePair = topLang,
                 topCategory = topCat,
