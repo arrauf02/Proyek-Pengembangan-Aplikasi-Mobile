@@ -31,10 +31,10 @@ fun VaultScreen(
             modifier = Modifier.fillMaxSize().padding(paddingValues).padding(horizontal = 16.dp)
         ) {
             if (groupedPhrases.isEmpty()) {
-                Text(
-                    text = "Belum ada frasa yang disimpan ke Vault.",
-                    modifier = Modifier.align(Alignment.Center),
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                com.example.bridgebit.presentation.components.AnimatedEmptyState(
+                    title = "Vault Kosong",
+                    subtitle = "Belum ada frasa yang disimpan ke Vault. Simpan frasa favoritmu untuk dilihat kembali!",
+                    modifier = Modifier.align(Alignment.Center)
                 )
             } else {
                 LazyColumn(
