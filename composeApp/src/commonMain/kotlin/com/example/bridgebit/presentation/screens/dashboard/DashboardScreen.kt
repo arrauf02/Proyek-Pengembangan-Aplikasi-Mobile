@@ -143,12 +143,13 @@ fun DashboardScreen(
             Box(modifier = Modifier.fillMaxSize().weight(1f), contentAlignment = Alignment.Center) {
                 when (state) {
                     is DashboardUiState.Loading -> CircularProgressIndicator()
-                    is DashboardUiState.Empty -> Text(
-                        text = if (searchQuery.isNotBlank() || filterState.selectedCategory != null || filterState.selectedLanguage != null || filterState.isVaultOnly)
-                            "Data tidak ditemukan."
-                        else "Belum ada riwayat terjemahan.",
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
+                    is DashboardUiState.Empty -> {
+                        val isSearch = searchQuery.isNotBlank() || filterState.selectedCategory != null || filterState.selectedLanguage != null || filterState.isVaultOnly
+                        com.example.bridgebit.presentation.components.AnimatedEmptyState(
+                            title = if (isSearch) "Data tidak ditemukan" else "Riwayat Kosong",
+                            subtitle = if (isSearch) "Coba ubah kata kunci atau filter pencarian Anda." else "Belum ada riwayat terjemahan. Mulai terjemahkan frasa baru!"
+                        )
+                    }
                     is DashboardUiState.Success -> {
                         val historyList = (state as DashboardUiState.Success).history
                         LazyColumn(
