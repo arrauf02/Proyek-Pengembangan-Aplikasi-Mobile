@@ -1,14 +1,18 @@
 package com.example.bridgebit.presentation.screens.workspace
 
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material.icons.filled.SwapHoriz
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.unit.dp
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -58,7 +62,34 @@ fun WorkspaceScreen(
                         }
                     }
                 }
-                Text("➔", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.primary)
+                
+                var swapRotation by remember { mutableStateOf(0f) }
+                val animatedSwapRotation by animateFloatAsState(
+                    targetValue = swapRotation,
+                    animationSpec = tween(durationMillis = 300),
+                    label = "SwapRotation"
+                )
+
+                IconButton(onClick = {
+                    swapRotation += 180f
+                    // Swap language
+                    val tempLang = viewModel.sourceLanguage.value
+                    viewModel.sourceLanguage.value = viewModel.targetLanguage.value
+                    viewModel.targetLanguage.value = tempLang
+                    
+                    // Swap text
+                    val tempText = viewModel.sourceText.value
+                    viewModel.sourceText.value = viewModel.translatedText.value
+                    viewModel.translatedText.value = tempText
+                }) {
+                    Icon(
+                        imageVector = Icons.Default.SwapHoriz,
+                        contentDescription = "Tukar Bahasa",
+                        modifier = Modifier.rotate(animatedSwapRotation),
+                        tint = MaterialTheme.colorScheme.primary
+                    )
+                }
+                
                 Box {
                     Row(modifier = Modifier.clickable { expandedTarget = true }.padding(8.dp), verticalAlignment = Alignment.CenterVertically) {
                         Text(viewModel.targetLanguage.value, style = MaterialTheme.typography.bodyLarge)
