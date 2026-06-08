@@ -1,6 +1,7 @@
 package com.example.bridgebit.presentation.screens.dashboard
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.expandHorizontally
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -21,6 +22,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.unit.dp
 import com.example.bridgebit.presentation.components.TranslationCard
 import org.koin.compose.viewmodel.koinViewModel
@@ -94,11 +96,12 @@ fun DashboardScreen(
 
                 // 2. Filter Kategori (Dropdown)
                 Box {
+                    val categoryRotation by animateFloatAsState(targetValue = if (expandedCategory) 180f else 0f)
                     FilterChip(
                         selected = filterState.selectedCategory != null,
                         onClick = { expandedCategory = true },
                         label = { Text(filterState.selectedCategory ?: "Kategori") },
-                        trailingIcon = { Icon(Icons.Default.ArrowDropDown, contentDescription = null) }
+                        trailingIcon = { Icon(Icons.Default.ArrowDropDown, contentDescription = null, modifier = Modifier.rotate(categoryRotation)) }
                     )
                     DropdownMenu(expanded = expandedCategory, onDismissRequest = { expandedCategory = false }) {
                         availableCategories.forEach { cat ->
@@ -115,11 +118,12 @@ fun DashboardScreen(
 
                 // 3. Filter Bahasa (Dropdown)
                 Box {
+                    val languageRotation by animateFloatAsState(targetValue = if (expandedLanguage) 180f else 0f)
                     FilterChip(
                         selected = filterState.selectedLanguage != null,
                         onClick = { expandedLanguage = true },
                         label = { Text(filterState.selectedLanguage ?: "Bahasa") },
-                        trailingIcon = { Icon(Icons.Default.ArrowDropDown, contentDescription = null) }
+                        trailingIcon = { Icon(Icons.Default.ArrowDropDown, contentDescription = null, modifier = Modifier.rotate(languageRotation)) }
                     )
                     DropdownMenu(expanded = expandedLanguage, onDismissRequest = { expandedLanguage = false }) {
                         availableLanguages.forEach { lang ->
