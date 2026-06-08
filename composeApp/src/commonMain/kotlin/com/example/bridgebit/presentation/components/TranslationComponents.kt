@@ -80,6 +80,16 @@ fun TranslationCard(
                     overflow = TextOverflow.Ellipsis,
                     modifier = Modifier.weight(1f)
                 )
+                // Bouncy Vault Icon Animation
+                val vaultScale by animateFloatAsState(
+                    targetValue = if (translation.isVaulted) 1.2f else 1f,
+                    animationSpec = spring(
+                        dampingRatio = Spring.DampingRatioMediumBouncy,
+                        stiffness = Spring.StiffnessLow
+                    ),
+                    label = "VaultIconScale"
+                )
+
                 Row(horizontalArrangement = Arrangement.spacedBy(Spacing.xs)) {
                     IconButton(
                         onClick = onVaultClick,
@@ -89,7 +99,7 @@ fun TranslationCard(
                             imageVector = if (translation.isVaulted) Icons.Filled.Bookmark else Icons.Outlined.BookmarkBorder,
                             contentDescription = if (translation.isVaulted) "Hapus dari Vault" else "Simpan ke Vault",
                             tint = if (translation.isVaulted) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
-                            modifier = Modifier.size(18.dp)
+                            modifier = Modifier.size(18.dp).scale(vaultScale)
                         )
                     }
                     IconButton(
