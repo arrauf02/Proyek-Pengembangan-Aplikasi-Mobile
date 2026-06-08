@@ -3,6 +3,8 @@ package com.example.bridgebit.presentation.screens.insights
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
@@ -774,9 +776,22 @@ fun QuizAnswerOption(
 
     val haptic = LocalHapticFeedback.current
 
+    // Shake animation state
+    val shakeOffset = remember { Animatable(0f) }
+    LaunchedEffect(isAnswered, isSelected, isCorrect) {
+        if (isAnswered && isSelected && !isCorrect) {
+            for (i in 0..2) {
+                shakeOffset.animateTo(10f, animationSpec = tween(50, easing = LinearEasing))
+                shakeOffset.animateTo(-10f, animationSpec = tween(50, easing = LinearEasing))
+            }
+            shakeOffset.animateTo(0f, animationSpec = tween(50, easing = LinearEasing))
+        }
+    }
+
     Card(
         modifier = modifier
             .fillMaxWidth()
+            .offset(x = shakeOffset.value.dp)
             .scale(scale)
             .clickable(enabled = !isAnswered, onClick = {
                 haptic.performHapticFeedback(HapticFeedbackType.LongPress)
