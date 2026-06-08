@@ -141,7 +141,16 @@ fun InsightsScreen(
 
                 ShimmerCard(modifier = Modifier.fillMaxWidth())
             } else {
-                Row(
+                var isVisible by remember { mutableStateOf(false) }
+                androidx.compose.runtime.LaunchedEffect(Unit) {
+                    isVisible = true
+                }
+                androidx.compose.animation.AnimatedVisibility(
+                    visible = isVisible,
+                    enter = androidx.compose.animation.fadeIn(androidx.compose.animation.core.tween(500)) + androidx.compose.animation.slideInVertically(androidx.compose.animation.core.tween(500)) { it / 8 }
+                ) {
+                    Column {
+                        Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
@@ -252,6 +261,8 @@ fun InsightsScreen(
                         } else {
                             VocabularyBarChart(data = state.dailyTranslationStats)
                         }
+                    }
+                }
                     }
                 }
             }
