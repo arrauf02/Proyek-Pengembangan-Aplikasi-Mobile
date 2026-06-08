@@ -935,6 +935,11 @@ fun QuizResultScreen(
         animationSpec = tween(durationMillis = 1000),
         label = "arcAnimation"
     )
+    val animatedScore by animateIntAsState(
+        targetValue = scoreText,
+        animationSpec = tween(durationMillis = 1000),
+        label = "scoreAnimation"
+    )
     LaunchedEffect(Unit) { animationProgress = percentage }
 
     Column(
@@ -973,7 +978,7 @@ fun QuizResultScreen(
                 modifier = Modifier.offset(y = 10.dp)
             ) {
                 Text(
-                    text = "$scoreText%",
+                    text = "$animatedScore%",
                     style = MaterialTheme.typography.displayMedium,
                     fontWeight = FontWeight.ExtraBold,
                     color = gaugeColor,
