@@ -12,12 +12,14 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-
+import kotlinx.datetime.Clock
 
 /**
  * UI state for the Insights screen.
  *
+ * @param isLoading             True if data is still being prepared/loaded (to show shimmer).
  * @param totalTranslations     Total number of translations in history.
+ * @param currentStreak         Current active consecutive learning days.
  * @param topicsDistribution    Map of category → count, used for the topic bar chart.
  * @param topLanguagePair       Most-used source→target language direction string.
  * @param topCategory           Name of the most-translated category.
@@ -25,7 +27,9 @@ import kotlinx.coroutines.launch
  *                              dayLabel is a short string like "Mon", "Tue", etc.
  */
 data class InsightsUiState(
+    val isLoading: Boolean = true,
     val totalTranslations: Int = 0,
+    val currentStreak: Int = 0,
     val topicsDistribution: Map<String, Int> = emptyMap(),
     val topLanguagePair: String = "-",
     val topCategory: String = "-",
@@ -58,14 +62,35 @@ class InsightsViewModel(
             }
             val dailyStats = dayNames.map { it to (dailyMap[it] ?: 0) }
 
+            // Streak calculation
+            val currentEpochDay = Clock.System.now().toEpochMilliseconds() / 86_400_000L
+            val uniqueDays = history.map { it.createdAt / 86_400_000L }.distinct().sortedDescending()
+            var streak = 0
+            if (uniqueDays.isNotEmpty()) {
+                val latestDay = uniqueDays.first()
+                if (latestDay == currentEpochDay || latestDay == currentEpochDay - 1) {
+                    var expectedDay = latestDay
+                    for (day in uniqueDays) {
+                        if (day == expectedDay) {
+                            streak++
+                            expectedDay--
+                        } else {
+                            break
+                        }
+                    }
+                }
+            }
+
             InsightsUiState(
+                isLoading = false,
                 totalTranslations = history.size,
+                currentStreak = streak,
                 topicsDistribution = topics,
                 topLanguagePair = topLang,
                 topCategory = topCat,
                 dailyTranslationStats = dailyStats
             )
-        }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), InsightsUiState())
+        }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), InsightsUiState(isLoading = true))
 
     // ── Quiz State ────────────────────────────────────────────────────────────
 

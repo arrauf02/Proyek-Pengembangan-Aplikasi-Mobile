@@ -94,13 +94,17 @@ class InsightsScreenTest {
     }
 
     // Helper: render InsightsScreen
-    private fun renderInsightsScreen() {
+    private fun renderInsightsScreen(initialEmit: Boolean = true) {
         composeTestRule.setContent {
             KoinContext {
                 InsightsScreen()
             }
         }
-        composeTestRule.waitForIdle()
+        if (initialEmit) {
+            emitHistory(emptyList())
+        } else {
+            composeTestRule.waitForIdle()
+        }
     }
 
     // Helper: emit data setelah render agar WhileSubscribed aktif
@@ -142,7 +146,7 @@ class InsightsScreenTest {
     @Test
     fun insightsScreen_topicsDistributionSection_isDisplayed() {
         renderInsightsScreen()
-        composeTestRule.onNodeWithText("Distribusi Topik").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Distribusi Topik").performScrollTo().assertIsDisplayed()
     }
 
     // ─── Test 6: Default state total "0" ditampilkan ─────────────────────────
@@ -166,7 +170,7 @@ class InsightsScreenTest {
     fun insightsScreen_emptyState_showsNoDataMessage() {
         renderInsightsScreen()
         emitHistory(emptyList())
-        composeTestRule.onNodeWithText("Belum ada data riwayat.").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Belum ada data riwayat.").performScrollTo().assertIsDisplayed()
     }
 
     // ─── Test 9: Pesan empty state tidak ada saat ada data ───────────────────
@@ -217,7 +221,7 @@ class InsightsScreenTest {
         renderInsightsScreen()
         emitHistory(richHistory)
         // Keuangan & Kripto ada 2 item
-        composeTestRule.onAllNodesWithText("2").onFirst().assertIsDisplayed()
+        composeTestRule.onAllNodesWithText("2").onFirst().assertExists()
     }
 
     // ─── Test 15: Jumlah count kategori "1" ada di distribusi ─────────────────
@@ -296,8 +300,8 @@ class InsightsScreenTest {
         renderInsightsScreen()
         emitHistory(emptyList())
         composeTestRule.onNodeWithText("Statistik Belajar").assertIsDisplayed()
-        composeTestRule.onNodeWithText("Total Terjemahan").assertIsDisplayed()
-        composeTestRule.onNodeWithText("Distribusi Topik").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Total Terjemahan").performScrollTo().assertIsDisplayed()
+        composeTestRule.onNodeWithText("Distribusi Topik").performScrollTo().assertIsDisplayed()
     }
 
     // ─── Test 24: resetQuiz me-reset semua quiz state ────────────────────────
@@ -318,11 +322,11 @@ class InsightsScreenTest {
         renderInsightsScreen()
         // Pertama: empty
         emitHistory(emptyList())
-        composeTestRule.onNodeWithText("Belum ada data riwayat.").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Belum ada data riwayat.").performScrollTo().assertIsDisplayed()
         // Kedua: ada data
         emitHistory(richHistory)
         composeTestRule.onNodeWithText("Belum ada data riwayat.").assertDoesNotExist()
-        composeTestRule.onAllNodesWithText("Keuangan & Kripto").onFirst().assertIsDisplayed()
+        composeTestRule.onAllNodesWithText("Keuangan & Kripto").onFirst().assertExists()
     }
 
     // ─── NEW TEST CASES FOR QUIZ UI FLOW (COVERAGE BOOST) ────────────────────

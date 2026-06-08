@@ -55,6 +55,7 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import org.koin.compose.viewmodel.koinViewModel
 import androidx.compose.material.icons.filled.Close
+import com.example.bridgebit.presentation.components.ShimmerCard
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -98,109 +99,148 @@ fun InsightsScreen(
         ) {
             Spacer(modifier = Modifier.height(8.dp))
 
-            // ── SECTION 1: KEY METRICS ────────────────────────────────────────
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                MetricCard(
-                    title = "Total Terjemahan",
-                    value = state.totalTranslations.toString(),
-                    icon = Icons.Default.GTranslate,
-                    modifier = Modifier.weight(1f),
-                    color = MaterialTheme.colorScheme.primary
-                )
-                MetricCard(
-                    title = "Kategori Favorit",
-                    value = state.topCategory,
-                    icon = Icons.Default.DataExploration,
-                    modifier = Modifier.weight(1f),
-                    color = Color(0xFFE65100)
-                )
+            // ── HEADER: STREAK CARD ───────────────────────────────────────────
+            if (state.isLoading) {
+                ShimmerCard(modifier = Modifier.fillMaxWidth().height(84.dp))
+                Spacer(modifier = Modifier.height(16.dp))
+            } else {
+                StreakCard(streakCount = state.currentStreak)
+                Spacer(modifier = Modifier.height(16.dp))
             }
 
-            Spacer(modifier = Modifier.height(12.dp))
-
-            // Language direction card
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(16.dp),
-                colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.secondaryContainer
-                )
-            ) {
+            // ── SECTION 1: KEY METRICS ────────────────────────────────────────
+            if (state.isLoading) {
                 Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(16.dp)
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    Icon(
-                        Icons.Default.Translate,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.onSecondaryContainer,
-                        modifier = Modifier.size(22.dp)
+                    ShimmerCard(modifier = Modifier.weight(1f))
+                    ShimmerCard(modifier = Modifier.weight(1f))
+                }
+
+                Spacer(modifier = Modifier.height(12.dp))
+
+                ShimmerCard(modifier = Modifier.fillMaxWidth())
+
+                Spacer(modifier = Modifier.height(28.dp))
+
+                // ── SECTION 2: TOPIC DISTRIBUTION (SKELETON) ────────────────────
+                SectionHeader(title = "Distribusi Topik", subtitle = "berdasarkan kategori")
+                Spacer(modifier = Modifier.height(12.dp))
+
+                ShimmerCard(modifier = Modifier.fillMaxWidth())
+
+                Spacer(modifier = Modifier.height(28.dp))
+
+                // ── SECTION 3: VOCABULARY GROWTH CHART (SKELETON) ───────────────
+                SectionHeader(title = "Pertumbuhan Kosakata", subtitle = "7 hari terakhir")
+                Spacer(modifier = Modifier.height(12.dp))
+
+                ShimmerCard(modifier = Modifier.fillMaxWidth())
+            } else {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    MetricCard(
+                        title = "Total Terjemahan",
+                        value = state.totalTranslations.toString(),
+                        icon = Icons.Default.GTranslate,
+                        modifier = Modifier.weight(1f),
+                        color = MaterialTheme.colorScheme.primary
                     )
-                    Column {
-                        Text(
-                            text = "Arah Bahasa Paling Sering",
-                            style = MaterialTheme.typography.labelMedium,
-                            color = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.7f)
+                    MetricCard(
+                        title = "Kategori Favorit",
+                        value = state.topCategory,
+                        icon = Icons.Default.DataExploration,
+                        modifier = Modifier.weight(1f),
+                        color = Color(0xFFE65100)
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(12.dp))
+
+                // Language direction card
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(16.dp),
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.secondaryContainer
+                    )
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(16.dp)
+                    ) {
+                        Icon(
+                            Icons.Default.Translate,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.onSecondaryContainer,
+                            modifier = Modifier.size(22.dp)
                         )
-                        Text(
-                            text = state.topLanguagePair,
-                            style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.onSecondaryContainer
-                        )
+                        Column {
+                            Text(
+                                text = "Arah Bahasa Paling Sering",
+                                style = MaterialTheme.typography.labelMedium,
+                                color = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.7f)
+                            )
+                            Text(
+                                text = state.topLanguagePair,
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.onSecondaryContainer
+                            )
+                        }
                     }
                 }
-            }
 
-            Spacer(modifier = Modifier.height(28.dp))
+                Spacer(modifier = Modifier.height(28.dp))
 
-            // ── SECTION 2: TOPIC DISTRIBUTION ────────────────────────────────
-            SectionHeader(title = "Distribusi Topik", subtitle = "berdasarkan kategori")
-            Spacer(modifier = Modifier.height(12.dp))
+                // ── SECTION 2: TOPIC DISTRIBUTION ────────────────────────────────
+                SectionHeader(title = "Distribusi Topik", subtitle = "berdasarkan kategori")
+                Spacer(modifier = Modifier.height(12.dp))
 
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(16.dp),
-                colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.surface
-                ),
-                elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
-            ) {
-                Column(modifier = Modifier.padding(16.dp)) {
-                    TopicDistributionSection(topicsDistribution = state.topicsDistribution)
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(16.dp),
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.surface
+                    ),
+                    elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
+                ) {
+                    Column(modifier = Modifier.padding(16.dp)) {
+                        TopicDistributionSection(topicsDistribution = state.topicsDistribution)
+                    }
                 }
-            }
 
-            Spacer(modifier = Modifier.height(28.dp))
+                Spacer(modifier = Modifier.height(28.dp))
 
-            // ── SECTION 3: VOCABULARY GROWTH CHART ───────────────────────────
-            SectionHeader(title = "Pertumbuhan Kosakata", subtitle = "7 hari terakhir")
-            Spacer(modifier = Modifier.height(12.dp))
+                // ── SECTION 3: VOCABULARY GROWTH CHART ───────────────────────────
+                SectionHeader(title = "Pertumbuhan Kosakata", subtitle = "7 hari terakhir")
+                Spacer(modifier = Modifier.height(12.dp))
 
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(16.dp),
-                colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.surface
-                ),
-                elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
-            ) {
-                Column(modifier = Modifier.padding(16.dp)) {
-                    if (state.dailyTranslationStats.all { it.second == 0 }) {
-                        Text(
-                            text = "Belum ada data terjemahan minggu ini.",
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            modifier = Modifier.padding(vertical = 24.dp)
-                        )
-                    } else {
-                        VocabularyBarChart(data = state.dailyTranslationStats)
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(16.dp),
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.surface
+                    ),
+                    elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
+                ) {
+                    Column(modifier = Modifier.padding(16.dp)) {
+                        if (state.dailyTranslationStats.all { it.second == 0 }) {
+                            Text(
+                                text = "Belum ada data terjemahan minggu ini.",
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                modifier = Modifier.padding(vertical = 24.dp)
+                            )
+                        } else {
+                            VocabularyBarChart(data = state.dailyTranslationStats)
+                        }
                     }
                 }
             }

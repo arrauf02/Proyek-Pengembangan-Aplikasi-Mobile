@@ -118,6 +118,60 @@ fun MetricCard(
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
+// STREAK CARD
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * A motivational header card showing the current learning streak.
+ */
+@Composable
+fun StreakCard(
+    streakCount: Int,
+    modifier: Modifier = Modifier
+) {
+    val gradientBrush = Brush.linearGradient(
+        colors = listOf(Color(0xFFFF8F00), Color(0xFFE64A19))
+    )
+
+    Card(
+        modifier = modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(16.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(gradientBrush)
+                .padding(16.dp),
+            contentAlignment = Alignment.CenterStart
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                Text(
+                    text = "🔥",
+                    fontSize = 32.sp
+                )
+                Column {
+                    Text(
+                        text = "Learning Streak",
+                        style = MaterialTheme.typography.labelMedium,
+                        color = Color.White.copy(alpha = 0.8f)
+                    )
+                    Text(
+                        text = if (streakCount > 0) "$streakCount Hari Berturut-turut!" else "Mulai Streak Hari Ini!",
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold,
+                        color = Color.White
+                    )
+                }
+            }
+        }
+    }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 // VOCABULARY BAR CHART
 // ─────────────────────────────────────────────────────────────────────────────
 
