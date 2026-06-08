@@ -3,11 +3,13 @@ package com.example.bridgebit.presentation.screens.insights
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
@@ -48,6 +50,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
@@ -760,11 +763,21 @@ fun QuizAnswerOption(
         else -> MaterialTheme.colorScheme.onSurface
     }
 
+    val scale by animateFloatAsState(
+        targetValue = if (isSelected) 1.03f else 1f,
+        animationSpec = spring(
+            dampingRatio = Spring.DampingRatioMediumBouncy,
+            stiffness = Spring.StiffnessLow
+        ),
+        label = "scaleAnim"
+    )
+
     val haptic = LocalHapticFeedback.current
 
     Card(
         modifier = modifier
             .fillMaxWidth()
+            .scale(scale)
             .clickable(enabled = !isAnswered, onClick = {
                 haptic.performHapticFeedback(HapticFeedbackType.LongPress)
                 onClick()
@@ -809,7 +822,12 @@ fun QuizAnswerOption(
             // Icon feedback
             AnimatedVisibility(
                 visible = isAnswered && (isCorrect || isSelected),
-                enter = fadeIn(animationSpec = tween(300)),
+                enter = fadeIn(animationSpec = tween(300)) + scaleIn(
+                    animationSpec = spring(
+                        dampingRatio = Spring.DampingRatioMediumBouncy,
+                        stiffness = Spring.StiffnessLow
+                    )
+                ),
                 exit = fadeOut()
             ) {
                 when {
