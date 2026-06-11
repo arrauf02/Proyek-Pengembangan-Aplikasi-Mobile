@@ -12,10 +12,11 @@ import org.koin.android.ext.koin.androidLogger
  * Entry point untuk inisialisasi app-wide dependencies.
  */
 class NoteAIApplication : Application() {
-    
+
     override fun onCreate() {
         super.onCreate()
-        
+        instance = this
+
         // Initialize Koin DI
         initKoin(
             platformModules = listOf(androidModule)
@@ -23,5 +24,11 @@ class NoteAIApplication : Application() {
             androidLogger()
             androidContext(this@NoteAIApplication)
         }
+    }
+
+    companion object {
+        /** Singleton instance untuk akses ApplicationContext di luar Composable scope. */
+        lateinit var instance: NoteAIApplication
+            private set
     }
 }
