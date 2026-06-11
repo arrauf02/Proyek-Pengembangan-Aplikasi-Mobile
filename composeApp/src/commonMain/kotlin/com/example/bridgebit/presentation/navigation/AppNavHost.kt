@@ -82,7 +82,7 @@ fun AppNavHost(
             var profileName by remember { mutableStateOf("Nama") }
             var profileEmail by remember { mutableStateOf("email@gmail.com") }
             var isEditingProfile by remember { mutableStateOf(false) }
-            var isNotificationEnabled by remember { mutableStateOf(true) }
+            val isNotificationEnabled by userPreferences.isNotificationEnabled.collectAsState(initial = false)
             
             var showClearDialog by remember { mutableStateOf(false) }
             val snackbarHostState = remember { SnackbarHostState() }
@@ -195,7 +195,7 @@ fun AppNavHost(
                                     .fillMaxWidth()
                                     .clickable {
                                         val isChecked = !isNotificationEnabled
-                                        isNotificationEnabled = isChecked
+                                        coroutineScope.launch { userPreferences.setNotificationEnabled(isChecked) }
                                         if (isChecked) {
                                             notificationService.requestPermission { granted ->
                                                 if (granted) {
