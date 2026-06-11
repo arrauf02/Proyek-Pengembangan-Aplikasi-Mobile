@@ -29,13 +29,13 @@ actual class NotificationService actual constructor() {
             if (ContextCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED) {
                 onResult(true)
             } else {
-                // Dalam skenario KMP murni tanpa Activity reference statis, kita bisa minta permission via UI terpisah,
-                // Namun untuk simplifikasi, jika context adalah Activity, kita request:
-                val activity = context as? Activity
+                val activity = NoteAIApplication.currentActivity
                 if (activity != null) {
                     ActivityCompat.requestPermissions(activity, arrayOf(Manifest.permission.POST_NOTIFICATIONS), 1001)
+                    // We don't have an easy way to hook into onRequestPermissionsResult from here.
+                    // If the user grants it, they will just need to toggle the setting again.
                 }
-                onResult(false) // Sementara return false sampai di-handle di onRequestPermissionsResult
+                onResult(false)
             }
         } else {
             onResult(true)
