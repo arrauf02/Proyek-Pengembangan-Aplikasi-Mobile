@@ -12,6 +12,7 @@ import com.example.bridgebit.data.repository.AIRepositoryImpl
 import com.example.bridgebit.domain.repository.AIRepository
 import com.example.bridgebit.domain.repository.TranslationRepository
 import com.example.bridgebit.domain.usecase.*
+import com.example.bridgebit.core.notification.NotificationService
 import com.example.bridgebit.presentation.screens.dashboard.DashboardViewModel
 import com.example.bridgebit.presentation.screens.workspace.WorkspaceViewModel
 import com.example.bridgebit.presentation.screens.detail.TranslationDetailViewModel // Import baru
@@ -35,6 +36,10 @@ val databaseModule = module {
         val driverFactory: DatabaseDriverFactory = get()
         BridgeBitDatabase(driverFactory.createDriver())
     }
+}
+
+val notificationModule = module {
+    singleOf(::NotificationService)
 }
 
 val preferencesModule = module {
@@ -70,6 +75,7 @@ val viewModelModule = module {
 val sharedModules = listOf(
     networkModule,
     databaseModule,
+    notificationModule,
     preferencesModule,
     repositoryModule,
     useCaseModule,
