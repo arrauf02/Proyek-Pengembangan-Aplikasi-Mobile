@@ -2,6 +2,7 @@ package com.example.bridgebit.presentation.navigation
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.clickable
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
@@ -74,6 +75,7 @@ fun AppNavHost(
         composable<Route.Settings> {
             val userPreferences: UserPreferences = koinInject()
             val clearAllHistoryUseCase: ClearAllHistoryUseCase = koinInject()
+            val notificationService: com.example.bridgebit.core.notification.NotificationService = koinInject()
             val isDarkMode by userPreferences.isDarkMode.collectAsState(initial = false)
             val coroutineScope = rememberCoroutineScope()
 
@@ -153,7 +155,12 @@ fun AppNavHost(
                     Spacer(modifier = Modifier.height(4.dp))
                     Card(modifier = Modifier.fillMaxWidth()) {
                         Row(
-                            modifier = Modifier.padding(16.dp).fillMaxWidth(),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable {
+                                    coroutineScope.launch { userPreferences.setDarkMode(!isDarkMode) }
+                                }
+                                .padding(16.dp),
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.SpaceBetween
                         ) {
@@ -184,18 +191,10 @@ fun AppNavHost(
                     Card(modifier = Modifier.fillMaxWidth()) {
                         Column(modifier = Modifier.padding(vertical = 8.dp)) {
                             Row(
-                                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp).fillMaxWidth(),
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.SpaceBetween
-                            ) {
-                                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                                    Icon(Icons.Default.Notifications, contentDescription = null)
-                                    Text(text = "Notifikasi Pengingat", style = MaterialTheme.typography.bodyLarge)
-                                }
-                                val notificationService: com.example.bridgebit.core.notification.NotificationService = koinInject()
-                                Switch(
-                                    checked = isNotificationEnabled,
-                                    onCheckedChange = { isChecked ->
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .clickable {
+                                        val isChecked = !isNotificationEnabled
                                         isNotificationEnabled = isChecked
                                         if (isChecked) {
                                             notificationService.requestPermission { granted ->
@@ -205,11 +204,25 @@ fun AppNavHost(
                                             }
                                         }
                                     }
+                                    .padding(horizontal = 16.dp, vertical = 12.dp),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.SpaceBetween
+                            ) {
+                                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                                    Icon(Icons.Default.Notifications, contentDescription = null)
+                                    Text(text = "Notifikasi Pengingat", style = MaterialTheme.typography.bodyLarge)
+                                }
+                                Switch(
+                                    checked = isNotificationEnabled,
+                                    onCheckedChange = null // Handled by Row click
                                 )
                             }
                             HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
                             Row(
-                                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp).fillMaxWidth(),
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .clickable { showClearDialog = true }
+                                    .padding(horizontal = 16.dp, vertical = 12.dp),
                                 verticalAlignment = Alignment.CenterVertically,
                                 horizontalArrangement = Arrangement.SpaceBetween
                             ) {
