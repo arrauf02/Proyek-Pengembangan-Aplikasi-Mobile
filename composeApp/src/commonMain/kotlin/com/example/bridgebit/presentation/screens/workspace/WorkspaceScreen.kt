@@ -134,7 +134,7 @@ fun WorkspaceScreen(
                 }
             }
 
-            // Input Teks Asal
+
             val maxCharCount = 500
             OutlinedTextField(
                 value = viewModel.sourceText.value,
@@ -177,7 +177,7 @@ fun WorkspaceScreen(
                 modifier = Modifier.fillMaxWidth().weight(1f)
             )
 
-            // Tombol Terjemahkan
+
             Button(
                 onClick = { viewModel.translateText() },
                 enabled = !viewModel.isLoading.value && viewModel.sourceText.value.isNotBlank(),
@@ -210,7 +210,7 @@ fun WorkspaceScreen(
                 Text(text = viewModel.errorMessage.value ?: "", color = MaterialTheme.colorScheme.error)
             }
 
-            // Output Teks Hasil Terjemahan + Tombol Copy
+
             Card(
                 modifier = Modifier.fillMaxWidth().weight(1f),
                 colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
@@ -223,7 +223,7 @@ fun WorkspaceScreen(
                         modifier = Modifier.align(Alignment.TopStart)
                     )
 
-                    // Tombol Copy dengan AnimatedContent: icon Copy → Check hijau
+
                     if (viewModel.translatedText.value.isNotBlank()) {
                         IconButton(
                             onClick = {

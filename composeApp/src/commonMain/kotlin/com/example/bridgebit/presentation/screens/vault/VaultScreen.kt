@@ -41,7 +41,7 @@ fun VaultScreen(
                     modifier = Modifier.fillMaxSize(),
                     contentPadding = PaddingValues(vertical = 8.dp)
                 ) {
-                    // MENAMPILKAN HEADER KATEGORI DAN ISINYA
+
                     groupedPhrases.forEach { (category, phrases) ->
                         stickyHeader {
                             Surface(

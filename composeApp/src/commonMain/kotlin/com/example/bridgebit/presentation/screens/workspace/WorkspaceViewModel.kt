@@ -75,7 +75,7 @@ class WorkspaceViewModel(
 
             aiRepository.chat(prompt)
                 .onSuccess { result ->
-                    // SAFE PARSING LOGIC
+
                     val translated = if (result.contains("T:")) {
                         result.substringAfter("T:").substringBefore("K:").trim()
                     } else {

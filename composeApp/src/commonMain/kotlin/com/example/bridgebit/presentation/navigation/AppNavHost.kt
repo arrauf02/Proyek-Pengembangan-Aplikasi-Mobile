@@ -279,7 +279,7 @@ fun AppNavHost(
                     }
                 )
             }
-            } // Close Scaffold lambda
+            }
         }
     }
 }

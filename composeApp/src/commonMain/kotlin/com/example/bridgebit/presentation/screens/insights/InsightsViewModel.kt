@@ -50,14 +50,12 @@ class InsightsViewModel(
             val topLang = history.groupBy { "${it.sourceLanguage} ➔ ${it.targetLanguage}" }
                 .maxByOrNull { it.value.size }?.key ?: "Belum ada"
 
-            // Build 7-day stats: group by day-of-week label from createdAt epoch ms.
-            // We use a simple modulo approach so we don't need kotlinx-datetime.
+
             val dayNames = listOf("Min", "Sen", "Sel", "Rab", "Kam", "Jum", "Sab")
             val dailyMap = mutableMapOf<String, Int>()
             dayNames.forEach { dailyMap[it] = 0 }
             history.forEach { item ->
-                // Day index from epoch: (epochDays + 4) % 7, where +4 shifts epoch
-                // Thu (Jan 1 1970) to Sunday=0 alignment.
+
                 val dayIndex = ((item.createdAt / 86_400_000L + 4) % 7).toInt()
                 val dayName = dayNames[dayIndex]
                 dailyMap[dayName] = (dailyMap[dayName] ?: 0) + 1
@@ -65,7 +63,7 @@ class InsightsViewModel(
             val dailyStats = dayNames.map { it to (dailyMap[it] ?: 0) }
             val weeklySum = dailyStats.sumOf { it.second }
 
-            // Streak calculation
+
             val currentEpochDay = Clock.System.now().toEpochMilliseconds() / 86_400_000L
             val uniqueDays = history.map { it.createdAt / 86_400_000L }.distinct().sortedDescending()
             var streak = 0
@@ -167,7 +165,7 @@ class InsightsViewModel(
 
                 val vocabularyList = wordPairs.shuffled().take(numQuestions).joinToString(", ")
 
-                // Call the new generateQuiz() — no more text parsing needed.
+
                 aiRepository.generateQuiz(numQuestions, vocabularyList)
                     .onSuccess { questions ->
                         if (questions.isNotEmpty()) {
