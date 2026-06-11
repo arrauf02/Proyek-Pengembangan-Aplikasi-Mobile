@@ -15,13 +15,19 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material.icons.filled.SwapHoriz
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import com.example.bridgebit.core.util.copyToClipboard
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import org.koin.compose.viewmodel.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -40,16 +46,31 @@ fun WorkspaceScreen(
     var expandedSource by remember { mutableStateOf(false) }
     var expandedTarget by remember { mutableStateOf(false) }
 
+    // State untuk animasi icon Copy → Check
+    var isCopied by remember { mutableStateOf(false) }
+    val snackbarHostState = remember { SnackbarHostState() }
+    val coroutineScope = rememberCoroutineScope()
+
     val availableLanguages = listOf("Indonesia", "Inggris", "Jepang", "Korea", "Arab", "Jerman")
 
     Scaffold(
+        snackbarHost = {
+            SnackbarHost(hostState = snackbarHostState) { data ->
+                Snackbar(
+                    snackbarData = data,
+                    containerColor = MaterialTheme.colorScheme.inverseSurface,
+                    contentColor = MaterialTheme.colorScheme.inverseOnSurface,
+                    actionColor = MaterialTheme.colorScheme.primary,
+                    shape = MaterialTheme.shapes.medium
+                )
+            }
+        },
         topBar = {
             TopAppBar(
                 title = { Text(if (translationId == null) "Workspace Terjemahan" else "Edit Terjemahan") },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) { Icon(Icons.Default.ArrowBack, contentDescription = "Kembali") }
                 }
-                // BLOK ACTIONS (TOMBOL SAVE) SUDAH SEPENUHNYA DIHAPUS DARI SINI
             )
         }
     ) { paddingValues ->
@@ -189,14 +210,62 @@ fun WorkspaceScreen(
                 Text(text = viewModel.errorMessage.value ?: "", color = MaterialTheme.colorScheme.error)
             }
 
-            // Output Teks Hasil Terjemahan
-            Card(modifier = Modifier.fillMaxWidth().weight(1f), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)) {
+            // Output Teks Hasil Terjemahan + Tombol Copy
+            Card(
+                modifier = Modifier.fillMaxWidth().weight(1f),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
+            ) {
                 Box(modifier = Modifier.fillMaxSize().padding(16.dp)) {
                     Text(
                         text = viewModel.translatedText.value,
                         style = MaterialTheme.typography.bodyLarge,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.align(Alignment.TopStart)
                     )
+
+                    // Tombol Copy dengan AnimatedContent: icon Copy → Check hijau
+                    if (viewModel.translatedText.value.isNotBlank()) {
+                        IconButton(
+                            onClick = {
+                                if (!isCopied) {
+                                    copyToClipboard(viewModel.translatedText.value)
+                                    isCopied = true
+                                    coroutineScope.launch {
+                                        snackbarHostState.showSnackbar(
+                                            message = "✓ Terjemahan disalin ke clipboard",
+                                            duration = SnackbarDuration.Short
+                                        )
+                                        delay(2000L)
+                                        isCopied = false
+                                    }
+                                }
+                            },
+                            modifier = Modifier.align(Alignment.BottomEnd)
+                        ) {
+                            AnimatedContent(
+                                targetState = isCopied,
+                                transitionSpec = {
+                                    fadeIn(animationSpec = tween(250)) togetherWith
+                                        fadeOut(animationSpec = tween(250))
+                                },
+                                label = "CopyIconAnimation"
+                            ) { copied ->
+                                if (copied) {
+                                    Icon(
+                                        imageVector = Icons.Default.Check,
+                                        contentDescription = "Berhasil disalin",
+                                        tint = Color(0xFF4CAF50) // Hijau Material
+                                    )
+                                } else {
+                                    Icon(
+                                        imageVector = Icons.Default.ContentCopy,
+                                        contentDescription = "Salin terjemahan",
+                                        tint = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }
