@@ -32,10 +32,33 @@ actual class NotificationService actual constructor() {
                 val activity = NoteAIApplication.currentActivity
                 if (activity != null) {
                     ActivityCompat.requestPermissions(activity, arrayOf(Manifest.permission.POST_NOTIFICATIONS), 1001)
-                    // We don't have an easy way to hook into onRequestPermissionsResult from here.
-                    // If the user grants it, they will just need to toggle the setting again.
+                    
+                    val app = activity.application
+                    var callback: android.app.Application.ActivityLifecycleCallbacks? = null
+                    callback = object : android.app.Application.ActivityLifecycleCallbacks {
+                        override fun onActivityCreated(a: Activity, savedInstanceState: android.os.Bundle?) {}
+                        override fun onActivityStarted(a: Activity) {}
+                        override fun onActivityResumed(a: Activity) {
+                            if (a == activity) {
+                                callback?.let { app.unregisterActivityLifecycleCallbacks(it) }
+                                if (ContextCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED) {
+                                    onResult(true)
+                                } else {
+                                    onResult(false)
+                                }
+                            }
+                        }
+                        override fun onActivityPaused(a: Activity) {}
+                        override fun onActivityStopped(a: Activity) {}
+                        override fun onActivitySaveInstanceState(a: Activity, outState: android.os.Bundle) {}
+                        override fun onActivityDestroyed(a: Activity) {
+                            if (a == activity) callback?.let { app.unregisterActivityLifecycleCallbacks(it) }
+                        }
+                    }
+                    app.registerActivityLifecycleCallbacks(callback)
+                } else {
+                    onResult(false)
                 }
-                onResult(false)
             }
         } else {
             onResult(true)
