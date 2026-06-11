@@ -192,9 +192,19 @@ fun AppNavHost(
                                     Icon(Icons.Default.Notifications, contentDescription = null)
                                     Text(text = "Notifikasi Pengingat", style = MaterialTheme.typography.bodyLarge)
                                 }
+                                val notificationService: com.example.bridgebit.core.notification.NotificationService = koinInject()
                                 Switch(
                                     checked = isNotificationEnabled,
-                                    onCheckedChange = { isNotificationEnabled = it }
+                                    onCheckedChange = { isChecked ->
+                                        isNotificationEnabled = isChecked
+                                        if (isChecked) {
+                                            notificationService.requestPermission { granted ->
+                                                if (granted) {
+                                                    notificationService.showNotification("Notifikasi Aktif", "Anda akan menerima pengingat harian dari BridgeBit!")
+                                                }
+                                            }
+                                        }
+                                    }
                                 )
                             }
                             HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
