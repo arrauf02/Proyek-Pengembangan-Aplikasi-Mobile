@@ -54,6 +54,7 @@ val useCaseModule = module {
     singleOf(::SaveTranslationUseCase)
     singleOf(::DeleteTranslationUseCase)
     singleOf(::ToggleVaultStatusUseCase)
+    singleOf(::ClearAllHistoryUseCase)
 }
 
 val viewModelModule = module {
