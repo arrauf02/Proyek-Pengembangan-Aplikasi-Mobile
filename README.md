@@ -33,8 +33,8 @@ BridgeBit adalah aplikasi penerjemah cerdas berbasis AI yang dirancang untuk mem
 
 |                          Phrase Vault                           | Learning Insights |                            AI Vocabulary Quiz                             |
 |:---------------------------------------------------------------:| :---: |:-------------------------------------------------------------------------:|
-|                ![Vault Screen](assets/vault.png)                | ![Insights Screen](assets/insights.png) |                      ![Quiz Screen](assets/quiz.png)                      |
-| Kumpulan kosakata favorit yang dikelompokkan berdasarkan topik. | Statistik belajar, *Learning Streak*, dan grafik distribusi topik. | Kuis pilihan ganda yang dihasilkan otomatis oleh AI dari riwayat belajar. |
+|                ![Vault Screen](assets/vault.png)                | ![Insights Screen 1](assets/insight.png)<br><br>![Insights Screen 2](assets/insight2.png) |                      ![Quiz Screen](assets/quiz.png)                      |
+| Kumpulan kosakata favorit yang dikelompokkan berdasarkan topik. | Statistik belajar, *Learning Streak*, grafik distribusi topik, dan pencapaian mingguan. | Kuis pilihan ganda yang dihasilkan otomatis oleh AI dari riwayat belajar. |
 
 ---
 
