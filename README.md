@@ -228,3 +228,11 @@ Buka file berikut di browser untuk melihat laporan interaktif:
 ```
 build/reports/kover/htmlDebug/index.html
 ```
+
+---
+
+## 📦 Release APK
+
+Aplikasi BridgeBit sudah dapat digunakan dan file `.apk` telah tersedia untuk diunduh. Anda bisa mengakses file APK-nya melalui tautan Google Drive di bawah ini:
+
+[Unduh BridgeBit APK](https://drive.google.com/drive/folders/1A72xfHPWw6eMLpoc5LTFzfRS3jDQmnro?usp=sharing)
